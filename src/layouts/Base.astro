@@ -1,0 +1,106 @@
+---
+import '@fontsource-variable/space-grotesk';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { ui, url, stripLang, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  backHref?: string; // when set, shows the "Back" link at the top-left
+}
+const { lang, title, description = ui[lang].description, backHref } = Astro.props;
+const path = stripLang(Astro.url.pathname);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href={url('/favicon.svg')} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="top-bar">
+      {backHref ? <a class="back" href={backHref}>← {ui[lang].back}</a> : <span></span>}
+      <LanguageSwitcher lang={lang} path={path} />
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root { color-scheme: dark; --mx: 50%; --my: 50%; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #000; color: #fff; overflow-x: hidden;
+    font-family: 'Space Grotesk Variable', system-ui, sans-serif;
+  }
+  /* Soft white glow that follows the mouse */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(500px circle at var(--mx) var(--my), rgb(255 255 255 / .07), transparent 60%);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+
+  .top-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 1.5rem 2rem;
+  }
+  .back {
+    text-decoration: none; opacity: .8; padding: .25rem 0;
+    transition: opacity .2s, text-shadow .2s;
+  }
+  .back:hover, .back:focus-visible { opacity: 1; text-shadow: 0 0 14px rgb(255 255 255 / .7); }
+
+  /* Respect the user's "reduce motion" system setting */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      transition-duration: .01ms !important;
+      transition-delay: 0s !important;
+    }
+  }
+</style>
+
+<script>
+  // Mouse glow (only on devices with a real hover pointer)
+  if (window.matchMedia('(hover: hover)').matches) {
+    let frame = 0;
+    window.addEventListener('pointermove', (e) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        document.documentElement.style.setProperty('--mx', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--my', `${e.clientY}px`);
+      });
+    });
+  }
+
+  // [data-menu] elements: open on hover via CSS on desktop, on tap on touch devices
+  const noHover = window.matchMedia('(hover: none)');
+  const menus = document.querySelectorAll<HTMLElement>('[data-menu]');
+
+  const closeMenu = (menu: HTMLElement) => {
+    menu.classList.remove('open');
+    menu.querySelector('button')?.setAttribute('aria-expanded', 'false');
+  };
+
+  menus.forEach((menu) => {
+    const button = menu.querySelector('button');
+    button?.addEventListener('click', (e) => {
+      if (!noHover.matches) return;
+      e.stopPropagation();
+      const isOpen = menu.classList.toggle('open');
+      button.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+
+  // Tapping anywhere else closes every open menu
+  document.addEventListener('click', () => menus.forEach(closeMenu));
+</script>

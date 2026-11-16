@@ -1,0 +1,96 @@
+---
+import Base from '../../layouts/Base.astro';
+import { languages, ui, url } from '../../i18n/utils';
+import { programmingLanguages } from '../../data/programmingLanguages';
+
+// One static page per site language: /pt/, /fr/, /en/
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang }, props: { lang } }));
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<Base lang={lang} title={`Your Name — ${t.role}`}>
+  <nav class="menu" aria-label="Menu">
+    <ul>
+      <li style="--i:0">
+        <a class="entry" href={url(`/${lang}/about/`)}>{t.about}</a>
+      </li>
+
+      <li style="--i:1" class="has-sub" data-menu>
+        <button class="entry" type="button" aria-expanded="false" aria-controls="sub-projects">
+          {t.projects}
+        </button>
+        <div class="sub" id="sub-projects">
+          <span class="line" aria-hidden="true"></span>
+          <ul>
+            {programmingLanguages.map((pl, i) => (
+              <li style={`--i:${i}`}>
+                <a href={url(`/${lang}/projects/${pl.slug}/`)}>{pl.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </nav>
+</Base>
+
+<style>
+  .menu {
+    min-height: 100svh; display: grid; align-content: center;
+    padding: 0 clamp(2rem, 8vw, 6rem);
+  }
+  .menu > ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3.5rem; }
+  /* Staggered fade-in when the page loads */
+  .menu > ul > li {
+    animation: enter .8s cubic-bezier(.2, .7, .2, 1) both;
+    animation-delay: calc(.2s + var(--i) * .12s);
+  }
+
+  .entry {
+    display: inline-block; font: inherit; font-size: clamp(1.5rem, 3.2vw, 2.4rem); font-weight: 500;
+    letter-spacing: .01em; color: #fff; text-decoration: none;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    transition: transform .3s, text-shadow .3s;
+  }
+  .entry:hover, .entry:focus-visible {
+    transform: translateX(.6rem);
+    text-shadow: 0 0 24px rgb(255 255 255 / .6);
+  }
+
+  /* Programming languages submenu */
+  .has-sub { position: relative; width: fit-content; }
+  .sub {
+    position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+    display: flex; align-items: center; padding-left: 1.5rem;
+    width: max-content;
+    visibility: hidden; transition: visibility 0s .35s;
+  }
+  /* Horizontal line that grows to the right */
+  .line {
+    width: clamp(3rem, 10vw, 8rem); height: 1px; background: #fff;
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .45s cubic-bezier(.2, .7, .2, 1);
+  }
+  .sub ul { list-style: none; margin: 0 0 0 1.5rem; padding: 0; display: grid; gap: 1rem; }
+  .sub li { opacity: 0; transform: translateX(-8px); transition: opacity .3s, transform .3s; }
+  .sub a {
+    display: inline-block; padding: .15rem 0; text-decoration: none;
+    white-space: nowrap;
+    font-size: clamp(1.1rem, 2vw, 1.5rem); opacity: .7;
+    transition: opacity .2s, text-shadow .2s;
+  }
+  .sub a:hover, .sub a:focus-visible { opacity: 1; text-shadow: 0 0 18px rgb(255 255 255 / .7); }
+
+  /* Open state: hover, keyboard focus, or tap on touch devices (.open) */
+  .has-sub:is(:hover, :focus-within, .open) .sub { visibility: visible; transition-delay: 0s; }
+  .has-sub:is(:hover, :focus-within, .open) .line { transform: scaleX(1); }
+  .has-sub:is(:hover, :focus-within, .open) .sub li {
+    opacity: 1; transform: none;
+    transition-delay: calc(.25s + var(--i) * .07s);
+  }
+
+  @keyframes enter { from { opacity: 0; transform: translateY(12px); } }
+</style>

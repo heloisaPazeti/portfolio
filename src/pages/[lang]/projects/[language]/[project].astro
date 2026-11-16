@@ -1,0 +1,50 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../../layouts/Base.astro';
+import { ui, url } from '../../../../i18n/utils';
+import { getProjects } from '../../../../lib/projects';
+
+// One page per project file, i.e. per (project × site language)
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((p) => ({
+    params: { lang: p.lang, language: p.entry.data.language, project: p.slug },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const { slug, lang, entry } = project;
+const t = ui[lang];
+const { Content } = await render(entry);
+---
+<Base
+  lang={lang}
+  title={entry.data.title}
+  description={entry.data.description}
+  backHref={url(`/${lang}/projects/${entry.data.language}/#${slug}`)}
+>
+  <article class="project">
+    {entry.data.cover && <img class="cover" src={url(entry.data.cover)} alt="" />}
+    <h1>{entry.data.title}</h1>
+    {entry.data.tech.length > 0 && <p class="tech">{entry.data.tech.join(' · ')}</p>}
+
+    <div class="body"><Content /></div>
+
+    <p class="links">
+      <a href={entry.data.repo}>{t.code}</a>
+      {entry.data.demo && <a href={entry.data.demo}>{t.demo}</a>}
+    </p>
+  </article>
+</Base>
+
+<style>
+  .project { max-width: 720px; margin: 0 auto; padding: 6rem 1.5rem 4rem; }
+  .cover { width: 100%; max-width: 360px; aspect-ratio: 1; object-fit: cover; border-radius: 4px; display: block; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 1.5rem 0 .25rem; }
+  .tech { opacity: .6; margin: 0 0 2rem; letter-spacing: .05em; }
+  .body { line-height: 1.7; }
+  .links { display: flex; gap: 1.5rem; margin-top: 2.5rem; }
+  .links a { text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 2px; }
+  .links a:hover, .links a:focus-visible { text-shadow: 0 0 14px rgb(255 255 255 / .7); }
+</style>

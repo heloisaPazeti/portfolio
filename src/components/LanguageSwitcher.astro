@@ -1,0 +1,81 @@
+---
+import { languages, ui, url, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang; // current language
+  path: string; // current path without the language prefix
+}
+const { lang, path } = Astro.props;
+const fullNames: Record<Lang, string> = { pt: 'Português', fr: 'Français', en: 'English' };
+---
+<div class="switcher" data-menu>
+  <button type="button" aria-label={ui[lang].language} aria-haspopup="true" aria-expanded="false">
+    <!-- Globe icon -->
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  </button>
+
+  <div class="sub">
+    <span class="line" aria-hidden="true"></span>
+    <ul>
+      {languages.map((l, i) => (
+        <li style={`--i:${i}`}>
+          <a
+            href={url(`/${l}${path}`)}
+            lang={l}
+            hreflang={l}
+            aria-label={fullNames[l]}
+            aria-current={l === lang ? 'true' : undefined}
+          >
+            {l.toUpperCase()}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .switcher { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+  button {
+    background: none; border: 0; color: inherit; cursor: pointer;
+    padding: .25rem; display: grid; place-items: center;
+    opacity: .8; transition: opacity .2s, transform .5s cubic-bezier(.2, .7, .2, 1);
+  }
+  .switcher:is(:hover, :focus-within, .open) button { opacity: 1; transform: rotate(20deg); }
+
+  .sub {
+    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: .5rem;
+    visibility: hidden; transition: visibility 0s .35s;
+  }
+  /* Vertical line that grows downwards */
+  .line {
+    width: 1px; height: 2.5rem; background: #fff;
+    transform: scaleY(0); transform-origin: top;
+    transition: transform .4s cubic-bezier(.2, .7, .2, 1);
+  }
+  ul { list-style: none; margin: .9rem 0 0; padding: 0; display: grid; gap: .7rem; justify-items: center; }
+  li { opacity: 0; transform: translateY(-6px); transition: opacity .3s, transform .3s; }
+  a {
+    display: inline-block; padding: .2rem .4rem; text-decoration: none;
+    font-size: .85rem; letter-spacing: .15em; opacity: .6;
+    transition: opacity .2s, text-shadow .2s;
+  }
+  a:hover, a:focus-visible, a[aria-current] { opacity: 1; }
+  a:hover, a:focus-visible { text-shadow: 0 0 14px rgb(255 255 255 / .7); }
+
+  /* Open state: hover, keyboard focus, or tap on touch devices (.open) */
+  .switcher:is(:hover, :focus-within, .open) .sub { visibility: visible; transition-delay: 0s; }
+  .switcher:is(:hover, :focus-within, .open) .line { transform: scaleY(1); }
+  .switcher:is(:hover, :focus-within, .open) li {
+    opacity: 1; transform: none;
+    transition-delay: calc(.2s + var(--i) * .07s); /* staggered entrance */
+  }
+</style>
