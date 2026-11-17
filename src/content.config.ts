@@ -16,4 +16,13 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+// "About me" text: one file per site language (pt.md, fr.md, en.md)
+const about = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/about' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+  }),
+});
+
+export const collections = { projects, about };
