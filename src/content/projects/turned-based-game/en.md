@@ -4,7 +4,7 @@ description: "A small Unity/C# learning project created to explore the implement
 language: "csharp"
 order: 4
 cover: "/projects/turned-based-game/cover.png"
-tech: ["C++", "Unity"]
+tech: ["C#", "Unity"]
 repo: "https://github.com/heloisaPazeti/Unity-Turn-Based-Game/"
 ---
 

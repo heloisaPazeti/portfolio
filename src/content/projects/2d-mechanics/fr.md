@@ -4,7 +4,7 @@ description: "Une collection de mécaniques de gameplay et de systèmes réutili
 language: "csharp"
 order: 2
 cover: "/projects/2d-mechanics/cover.png"
-tech: ["C++", "Unity"]
+tech: ["C#", "Unity"]
 repo: "https://github.com/heloisaPazeti/UnityMechanics2D"
 ---
 

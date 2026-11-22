@@ -4,7 +4,7 @@ description: "Un petit projet développé avec Unity et C# qui explore l'implém
 language: "csharp"
 order: 3
 cover: "/projects/dialog-systems/cover.png"
-tech: ["C++", "Unity"]
+tech: ["C#", "Unity"]
 repo: "https://github.com/heloisaPazeti/DialogSystemTest/"
 ---
 

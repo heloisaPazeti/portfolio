@@ -4,7 +4,7 @@ description: "Um pequeno projeto em Unity/C# que explora a implementação de um
 language: "csharp"
 order: 3
 cover: "/projects/dialog-systems/cover.png"
-tech: ["C++", "Unity"]
+tech: ["C#", "Unity"]
 repo: "https://github.com/heloisaPazeti/DialogSystemTest/"
 ---
 

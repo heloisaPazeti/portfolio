@@ -4,7 +4,7 @@ description: "A small 2D space racing / endless-runner game developed in Unity a
 language: "csharp"
 order: 1
 cover: "/projects/space-war/cover.png"
-tech: ["C++", "Unity"]
+tech: ["C#", "Unity"]
 repo: "https://github.com/heloisaPazeti/SpaceWar"
 ---
 
